@@ -1,0 +1,13 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+db.sqlite3
+db.sqlite3-journal
+.vscode/
+.idea/
+*.deb
+*.vsix
+ms-python.python-latest@alpine-x64.vsix:Zone.Identifier

@@ -1,0 +1,29 @@
+<!--шаблон базовой страницы-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>О сайте</title>
+</head>
+<body>
+{% block mainmenu %}
+<div class="header">
+    <ul id="mainmenu" class="mainmenu">
+        <li class="logo"><a href="{% url 'welcome' %}"><div class="logo"></div></a></li>
+        {% comment %}
+        {% for m in menu %}
+            <li><a href="{% url m.url_name %}">{{m.title}}</a></li>
+        {% endfor %}
+        {% endcomment %}
+        <li class="last"><a href="{% url 'register' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a></li>
+    </ul>
+    <div class="clear"></div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+</body>
+</html>
+
+
