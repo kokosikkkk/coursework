@@ -1,0 +1,18 @@
+<ul>
+    {% for task in tasks %}
+        <li>
+            <span>{{task.name}}</span>
+            {% if not task.status %}
+                <form method='post' action="{% url 'complete' task.id %}" >
+                    {% csrf_token %}
+                    <button type="submit">Готово</button>
+                </form>
+            {% endif %}
+
+            <form method='post' action="{% url 'not_complete' task.id %}" >
+                {% csrf_token %}
+                <button type="submit">Удалить</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>

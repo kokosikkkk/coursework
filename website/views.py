@@ -1,13 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import RegisterForm
 from django.contrib.auth.views import LoginView
-
+from .models import ToDoList
 
 # Create your views here.
 class WelcomeWebsite(TemplateView):
@@ -50,5 +50,40 @@ class LoginUser(DataMixin, LoginView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Авторизация")
         return dict(list(context.items()) + list(c_def.items()))
+    
+def show_tasks(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            if name:
+                ToDoList.objects.create(
+                    user = request.user,
+                    name = name,
+                    status = False
+                )
+            return redirect('tasks') #перенаправление на ту же страницу
+        else:
+            tasks = ToDoList.objects.filter(user=request.user)
+            return render(request, 'website/table.html', {'tasks': tasks})
+    else:
+        return render(request, 'welcome.html')
+    
+def is_complete(request, task_id):
+    task = ToDoList.objects.get(id=task_id, user=request.user)
+    task.status = True
+    task.save()
+    return redirect('tasks')
+
+def not_completed(request, task_id):
+    task = ToDoList.objects.get(id=task_id, user=request.user)
+    task.status = False
+    task.save()
+    return redirect('tasks')
+
+def delete(request, task_id):
+    task = ToDoList.objects.get(id=task_id, user=request.user)
+    task.delete()
+    return redirect('tasks')
+
     
     
