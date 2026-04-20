@@ -1,18 +1,42 @@
-<ul>
-    {% for task in tasks %}
-        <li>
-            <span>{{task.name}}</span>
-            {% if not task.status %}
-                <form method='post' action="{% url 'complete' task.id %}" >
-                    {% csrf_token %}
-                    <button type="submit">Готово</button>
-                </form>
-            {% endif %}
+{% load static %}
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>To-do list</title>
+  <link rel="stylesheet" href="{% static 'website/css/style.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="todo-list">
+        <h1>To-do list</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="input-container">
+                <input type="text" name="name" placeholder="Add a new task" required>
+                <button type="submit">+</button>
+            </div>
+        </form>
 
-            <form method='post' action="{% url 'not_complete' task.id %}" >
-                {% csrf_token %}
-                <button type="submit">Удалить</button>
-            </form>
-        </li>
-    {% endfor %}
-</ul>
+
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <span>{{task.task_name}}</span>
+                    {% if not task.status %}
+                        <form method='post' action="{% url 'complete' task.id %}" >
+                            {% csrf_token %}
+                            <button type="submit">Готово</button>
+                        </form>
+                    {% endif %}
+                        
+                    <form method='post' action="{% url 'not_complete' task.id %}" >
+                        {% csrf_token %}
+                        <button type="submit">Удалить</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+</body>
+</html>    
