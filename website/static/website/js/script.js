@@ -35,3 +35,44 @@ function getCookie(name){
     }
     return csrf;
 }
+document.querySelectorAll('.edit').forEach(button =>{
+    button.addEventListener('click', function() {
+        const task_id = this.dataset.id;
+        const task_element = this.parentElement.querySelector('.task')
+        const task_text = task_element.innerText;
+        const new_text = prompt("Редактировать:", task_text);
+        if (new_text && new_text !== task_text){
+            fetch(`/edit/${task_id}/`,{
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name: new_text})
+            }).then(response => {
+                if (response.ok){
+                    task_element.innerText = new_text;
+                }
+            });
+        }
+    });
+});
+
+document.querySelectorAll('.delete').forEach(button =>{
+    button.addEventListener('click', function() {
+        const task_id = this.dataset.id;
+        if (confirm('Подтвердите удаление')){
+            fetch(`/delete/${task_id}/`,{
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok){
+                    this.closest('li').remove();
+                }
+            });
+        }
+    });
+});

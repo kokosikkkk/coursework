@@ -8,6 +8,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import RegisterForm
 from django.contrib.auth.views import LoginView
 from .models import ToDoList
+from django.http import JsonResponse
+import json
 
 # Create your views here.
 class WelcomeWebsite(TemplateView):
@@ -58,7 +60,7 @@ def show_tasks(request):
             if name:
                 ToDoList.objects.create(
                     user = request.user,
-                    name = name,
+                    task_name = name,
                     status = False
                 )
             return redirect('tasks') #перенаправление на ту же страницу
@@ -80,10 +82,28 @@ def not_completed(request, task_id):
     task.save()
     return redirect('tasks')
 
-def delete(request, task_id):
-    task = ToDoList.objects.get(id=task_id, user=request.user)
-    task.delete()
-    return redirect('tasks')
+def delete_task(request, task_id):
+    if request.method == 'POST':
+        task = ToDoList.objects.get(id=task_id, user=request.user)
+        task.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'succes': False})
 
+def toggle_status(request, task_id):
+    if request.method == 'POST':
+        task = ToDoList.objects.get(id=task_id, user=request.user)
+        data = json.loads(request.body)
+        task.status = data.get('status', False)
+        task.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'succes': False})
+def edit_task(request, task_id):
+    if request.method == 'POST':
+        task = ToDoList.objects.get(id=task_id, user=request.user)
+        data = json.loads(request.body)
+        task.status = data.get('status', False)
+        task.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'succes': False})
     
     
