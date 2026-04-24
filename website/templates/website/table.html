@@ -25,9 +25,10 @@
                 <li>
                     <input type="checkbox" class="checkbox" {% if task.status %}checked{% endif %} data-id="{{task.id}}">
                     <span class="task {% if task.status %}completed{% endif %}">{{ task.task_name }}</span>
-                    <button type="button" class="delete" data-id="{{task.id}}"><i class="fas fa-trash-alt"></i></button>
-                    <button type="button" class="edit" data-id="{{task.id}}"><i class="fas fa-edit"></i></button>
-                
+                    <div class="auxiliary-buttons">
+                        <button type="button" class="delete" data-id="{{task.id}}"><i class="fas fa-trash-alt"></i></button>
+                        <button type="button" class="edit" data-id="{{task.id}}"><i class="fas fa-pen"></i></button>
+                    </div>
                 </li>
             {% endfor %}
         </ul>

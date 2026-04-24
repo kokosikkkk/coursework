@@ -101,9 +101,9 @@ def edit_task(request, task_id):
     if request.method == 'POST':
         task = ToDoList.objects.get(id=task_id, user=request.user)
         data = json.loads(request.body)
-        task.status = data.get('status', False)
+        task.task_name = data.get('name', task.task_name)
         task.save()
         return JsonResponse({'success': True})
-    return JsonResponse({'succes': False})
+    return JsonResponse({'success': False})
     
     
