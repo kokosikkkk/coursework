@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="{% static 'website/css/style.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="{% static 'website/js/script.js' %}" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
 <div class="container">
@@ -15,7 +17,10 @@
             {% csrf_token %}
             <div class="input-container">
                 <input type="text" name="name" placeholder="Add a new task" required>
+                <input type="text" id="chooseDate" name="deadline" placeholder="Выберите дату" style="display: none;">
+                <button type="button" class="calendar" id="calendarBtn"><i class="fas fa-calendar-alt"></i></button>
                 <button type="submit">+</button>
+                
             </div>
         </form>
 
@@ -25,13 +30,42 @@
                 <li>
                     <input type="checkbox" class="checkbox" {% if task.status %}checked{% endif %} data-id="{{task.id}}">
                     <span class="task {% if task.status %}completed{% endif %}">{{ task.task_name }}</span>
+                    
                     <div class="auxiliary-buttons">
+                        <button type="button" class="timer" data-id="{{task.id}}"><i class="fas fa-clock"></i></button>
                         <button type="button" class="delete" data-id="{{task.id}}"><i class="fas fa-trash-alt"></i></button>
                         <button type="button" class="edit" data-id="{{task.id}}"><i class="fas fa-pen"></i></button>
                     </div>
                 </li>
             {% endfor %}
         </ul>
+    </div>
+</div>
+<div id="timerModal" class="modal-overlay">
+    <div class="modal-contain">
+        <div class="modal-header">
+            <h3>Таймер</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="timer" id="modalTimer">00:00:00</div>
+            <div class="input">
+                <input type="number" id = "hours" min="0" value="0">
+                <input type="number" id ="minutes" min="0" value="0">
+                <input type="number" id = "seconds" min="0" max="59" value="0">
+            </div>
+            <div class="timer-buttons">
+                <button class = "starttimer">
+                    <i class="fas fa-play-circle"></i>
+                </button>
+                <button class = "pausetimer">
+                    <i class="fas fa-pause-circle"></i>
+                </button>
+                <button class = "endtimer">
+                    <i class="fas fa-stop-circle"></i>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 </body>

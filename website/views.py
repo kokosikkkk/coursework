@@ -58,14 +58,17 @@ def show_tasks(request):
         if request.method == 'POST':
             name = request.POST.get('name')
             if name:
+                deadline = request.POST.get('deadline') or None
                 ToDoList.objects.create(
                     user = request.user,
                     task_name = name,
-                    status = False
+                    status = False,
+                    dead_line = deadline
                 )
             return redirect('tasks') #перенаправление на ту же страницу
         else:
-            tasks = ToDoList.objects.filter(user=request.user)
+            tasks = ToDoList.objects.filter(user=request.user).order_by('dead_line')
+            tasks = sorted(tasks, key=lambda t: (t.dead_line is None, t.dead_line)) #задачи без даты убираем вниз
             return render(request, 'website/table.html', {'tasks': tasks})
     else:
         return render(request, 'welcome.html')
@@ -106,4 +109,35 @@ def edit_task(request, task_id):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
     
-    
+def timer_page(request):
+    return render(request, 'website/timer.html')
+
+def task_time(request, task_id):
+    if request.method == 'POST':
+        try:
+            task = ToDoList.objects.get(id=task_id, user=request.user)
+            data = json.loads(request.body)
+            sec = data.get('seconds', 0)
+            task.spent_time += sec
+            task.save()
+            return JsonResponse({'success': True, 'total_time': task.spent_time})
+        except ToDoList.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid method'})
+
+def statistics_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    tasks= ToDoList.objects.filter(user=request.user)
+    total_tasks = tasks.count()
+    completed_tasks = tasks.filter(status=True).count()
+
+    if total_tasks > 0:
+        percent = round(completed_tasks / total_tasks * 100)
+    else:
+        percent = 0
+    return render(request, 'website/statistics.html',{
+        'total_tasks': total_tasks,
+        'completed_tasks': completed_tasks,
+        'percent': percent,
+    })

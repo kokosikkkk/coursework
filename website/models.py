@@ -8,3 +8,4 @@ class ToDoList(models.Model):
     description = models.TextField(blank=True)
     status = models.BooleanField(default=False)
     dead_line = models.DateField(null=True, blank=True)
+    spent_time = models.IntegerField(default=0, verbose_name="секунды")
