@@ -15,6 +15,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from .forms import ChangeUsernameForm
+from django.contrib.auth import login
 
 # Create your views here.
 class WelcomeWebsite(TemplateView):
@@ -42,7 +43,14 @@ class DataMixin:
 class RegisterUser(DataMixin, CreateView):
     form_class = RegisterForm
     template_name = 'website/register.html'
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('profile')
+
+    def form_valid(self, form):
+        user =form.save()
+        login(self.request, user)
+        messages.success(self.request, f'Добро пожаловать, {user.username}!')
+        return redirect(self.success_url)
+    
 
     def get_context_data(self, object_list = None, **kwargs):
         context = super().get_context_data(**kwargs)
