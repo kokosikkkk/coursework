@@ -16,6 +16,10 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from .forms import ChangeUsernameForm
 from django.contrib.auth import login
+from django.db.models import Sum, Q, Count, Avg
+from django.db.models.functions import TruncDate
+from django.utils import timezone
+
 
 # Create your views here.
 class WelcomeWebsite(TemplateView):
@@ -89,12 +93,14 @@ def show_tasks(request):
 def is_complete(request, task_id):
     task = ToDoList.objects.get(id=task_id, user=request.user)
     task.status = True
+    task.completed_at = timezone.now()
     task.save()
     return redirect('tasks')
 
 def not_completed(request, task_id):
     task = ToDoList.objects.get(id=task_id, user=request.user)
     task.status = False
+    task.completed_at = None
     task.save()
     return redirect('tasks')
 
@@ -109,7 +115,12 @@ def toggle_status(request, task_id):
     if request.method == 'POST':
         task = ToDoList.objects.get(id=task_id, user=request.user)
         data = json.loads(request.body)
-        task.status = data.get('status', False)
+        new_status = data.get('status', False)
+        if new_status and not task.status:
+            task.completed_at = timezone.now()
+        elif not new_status and task.status:
+            task.completed_at = None
+        task.status = new_status
         task.save()
         return JsonResponse({'success': True})
     return JsonResponse({'succes': False})
@@ -137,7 +148,7 @@ def task_time(request, task_id):
         except ToDoList.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Task not found'})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
-
+'''
 def statistics_page(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -154,6 +165,37 @@ def statistics_page(request):
         'completed_tasks': completed_tasks,
         'percent': percent,
     })
+'''
+def statistics_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    user_tasks = ToDoList.objects.filter(user=request.user)
+    total_statistic = user_tasks.aggregate(
+        total_tasks = Count('id'),
+        completed_tasks = Count('id', filter=Q(status=True)),
+        total_spend_time = Sum('spent_time'),
+        average_time = Avg('spent_time', default=0)
+    )
+    daily_statistic = user_tasks.filter(status=True).exclude(completed_at__isnull= True)\
+        .annotate(day=TruncDate('completed_at')).values('day')\
+        .annotate(tasks_completed=Count('id'), time_spent=Sum('spent_time')).order_by('-day')[:7]
+
+    dates = [s['day'].strftime('%d.%m') for s in daily_statistic]
+    count_comp_tasks = [s['tasks_completed'] for s in daily_statistic]
+    time = [s['time_spent'] or 0 for s in daily_statistic]
+
+    return render(request, 'website/statistics.html', {
+        'total_statistics': total_statistic,
+        'dates': dates,
+        'count_comp_tasks': count_comp_tasks,
+        'time': time,
+    })
+    
+
+
+
+
+
 
 def profile_page(request):
     if not request.user.is_authenticated:

@@ -1,0 +1,172 @@
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 10px;
+}
+
+
+.back-block{
+    background-color: white;
+    border-radius: 28px;
+    padding: 20px;
+    border:1px solid #f0eae4;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
+
+.todo-list h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c2a29;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.statistic-numbers {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.statistic-numbers p {
+    background: #f9f7f5;
+    padding: 20px 15px;
+    border-radius: 24px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #5c5a58;
+    margin: 0;
+    transition: all 0.2s;
+    border: 1px solid #f0eae4;
+}
+
+.statistic-numbers p:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+}
+
+.statistic-numbers strong {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c2a29;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.chart-container {
+    background: #fefcf9;
+    border-radius: 28px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #f0eae4;
+    width: 100%;
+}
+.chart-container {
+    display: block;
+    width: 100%;
+}
+
+
+.chart-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.tasks-button, .time-button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 60px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f0ede9;
+    color: #2c2a29;
+}
+
+.tasks-button.active, .time-button.active {
+    background: #2c2a29;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tasks-button:hover, .time-button:hover {
+    transform: scale(1.02);
+}
+
+
+.right-column canvas {
+    max-width: 90%;  
+    height: 200px !important;
+    display: block;
+    margin: 0 auto;  
+}
+
+
+a {
+    display: inline-block;
+    color: #9b8c7c;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+    margin-top: 10px;
+}
+
+a:hover {
+    color: #2c2a29;
+}
+.column-container{
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: center;  
+    align-items: flex-start;
+}
+.left-column{
+    width: 280px;  
+    flex-shrink: 0; 
+    margin-left: 0;
+}
+.right-column {
+    width: 500px;  
+    flex-shrink: 0;
+    margin-right: 0;
+}
+.todo-list {
+    all: unset !important;  
+    display: block !important;
+    width: 100% !important;
+    max-width: 1400px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+}
+body {
+    overflow: hidden;
+    height: 100vh;
+}
+.chart-title {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c2a29;
+}
+.chart-note {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 0;
+    color: #9b8c7c;
+    font-size: 0.85rem;
+}
+
+.chart-note strong {
+    color: #2c2a29;
+    font-weight: 600;
+}

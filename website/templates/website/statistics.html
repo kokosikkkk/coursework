@@ -1,0 +1,54 @@
+{% extends "website/base.html" %}
+
+{% load static %}
+
+{%block title %}Statistic{%endblock%}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'website/css/statistics.css'%}">
+{% endblock %}
+
+{%block content %}
+
+<div class="container">
+    <div class="todo-list">
+        <h1>Общая статистика</h1>
+        <div class="column-container">
+            <div class = "left-column">
+                <div class = "back-block">
+                    <div class="statistic-numbers">
+                        <p> всего задач: <strong>{{ total_statistics.total_tasks}}</strong></p>
+                        <p> выполнено задач: <strong>{{ total_statistics.completed_tasks}}</strong></p>
+                        <p> прогресс: <strong>{{ total_statistics.total_spend_time|default:"0"}} секунд </strong></p>
+                        <p> среднее время на задачу: <strong>{{ total_statistics.average_time|floatformat:"0"}} секунд</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="right-column">
+                <div class = "chart-container">
+                    <div class="chart-buttons">
+                        <button id="showTasks" class="tasks-button">Завершенные задачи</button>
+                        <button id="showTime" class="time-button">Затраченное время</button>
+                    </div>
+                    <canvas id="barChart" width="700" height="350"></canvas>
+                </div>
+                <div class = "chart-container">
+                    <h3 class="chart-title">Динамика продуктивности</h3>
+                    <canvas id="lineChart" width="700" height="350"></canvas>
+                    <p class="chart-note">
+                        Продуктивный день: <strong id="productiveDay">-</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'website/js/chart.umd.min.js' %}"></script>
+<script>
+    window.statisticLabels = {{ dates|safe }};
+    window.statisticData = {{ count_comp_tasks|safe}};
+    window.statisticTime={{ time|safe}};
+</script>
+<script src = "{% static 'website/js/statistics.js'%}"></script>
+{% endblock %}
