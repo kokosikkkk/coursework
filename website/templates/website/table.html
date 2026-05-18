@@ -18,7 +18,7 @@
             <div class="input-container">
                 <input type="text" name="name" placeholder="Add a new task" required>
                 <input type="text" id="chooseDate" name="deadline" placeholder="Выберите дату" style="display: none;">
-                <button type="button" class="calendar" id="calendarBtn"><i class="fas fa-calendar-alt"></i></button>
+                <button type="button" class="calendar" id="calendarBtn" title="Календарь"><i class="fas fa-calendar-alt"></i></button>
                 <button type="submit">+</button>
                 
             </div>
@@ -36,9 +36,9 @@
                             </div>
 
                             <div class="auxiliary-buttons">
-                                <button type="button" class="timer" data-id="{{task.id}}"><i class="fas fa-clock"></i></button>
-                                <button type="button" class="delete" data-id="{{task.id}}"><i class="fas fa-trash-alt"></i></button>
-                                <button type="button" class="edit" data-id="{{task.id}}"><i class="fas fa-pen"></i></button>
+                                <button type="button" class="timer" data-id="{{task.id}}" title="Таймер"><i class="fas fa-clock"></i></button>
+                                <button type="button" class="delete" data-id="{{task.id}}" title="Удалить"><i class="fas fa-trash-alt"></i></button>
+                                <button type="button" class="edit" data-id="{{task.id}}" title="Редактировать"><i class="fas fa-pen"></i></button>
                             </div>
                         </div>
                     <div class="task-time" id="time-{{task.id}}">
@@ -47,23 +47,25 @@
                                 {{ task.get_time }}
                             {% endif %}
                         </span>
-                    <div>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
     </div>
 </div>
 <div id="timerModal" class="modal-overlay">
-    <div class="modal-contain">
+    <div class="modal-container">
         <div class="modal-header">
             <h3>Таймер</h3>
             <span class="close">&times;</span>
         </div>
         <div class="modal-body">
-            <div class="timer" id="modalTimer">00:00:00</div>
-            <div class="input">
+            <div class="timer-display" id="modalTimer">00:00:00</div>
+            <div class="timer-input">
                 <input type="number" id = "hours" min="0" value="0">
+                <span class="separator">:</span>
                 <input type="number" id ="minutes" min="0" value="0">
+                <span class="separator">:</span>
                 <input type="number" id = "seconds" min="0" max="59" value="0">
             </div>
             <div class="timer-buttons">
