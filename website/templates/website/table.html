@@ -17,10 +17,11 @@
             {% csrf_token %}
             <div class="input-container">
                 <input type="text" name="name" placeholder="Add a new task" required>
-                <input type="text" id="chooseDate" name="deadline" placeholder="Выберите дату" style="display: none;">
-                <button type="button" class="calendar" id="calendarBtn" title="Календарь"><i class="fas fa-calendar-alt"></i></button>
+                <div class="date-wrapper">
+                    <input type="text" id="chooseDate" name="deadline" placeholder="Выберите дату" style="display: none;">
+                    <button type="button" class="calendar" id="calendarBtn" title="Календарь"><i class="fas fa-calendar-alt"></i></button>
+                </div>
                 <button type="submit">+</button>
-                
             </div>
         </form>
 
@@ -32,7 +33,9 @@
                         <div class="task-main-row">
                             <div class="task-info">
                                 <input type="checkbox" class="checkbox" {% if task.status %}checked{% endif %} data-id="{{task.id}}">
+                                
                                 <span class="task {% if task.status %}completed{% endif %}">{{ task.task_name }}</span>
+                                
                             </div>
 
                             <div class="auxiliary-buttons">
@@ -41,7 +44,29 @@
                                 <button type="button" class="edit" data-id="{{task.id}}" title="Редактировать"><i class="fas fa-pen"></i></button>
                             </div>
                         </div>
-                    <div class="task-time" id="time-{{task.id}}">
+                        
+                        <div class="task-meta">
+                            <div class="subject-picker" data-id="{{task.id}}">
+                                <span class="subject-icon" title="Выбрать предмет">
+                                    📚 {{ task.get_task_type_display }}
+                                </span>
+                                <select class="subject-dropdown" data-id="{{task.id}}" style="display: none;">
+                                    
+                                    {% for value, label in task_types %}
+                                        <option value="{{ value }}" 
+                                        {% if task.task_type == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                    
+                            {% if task.dead_line %}
+                                <span class="task-deadline">До: {{ task.dead_line|date:"d.m.Y" }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="task-time" id="time-{{task.id}}">
                         <span>
                             {% if task.spent_time > 0 %}
                                 {{ task.get_time }}

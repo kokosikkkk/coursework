@@ -26,6 +26,15 @@
             </div>
             <div class="right-column">
                 <div class = "chart-container">
+                    <div class="filter-row">
+                        <label for="taskTypeFilter">Тип задачи:</label>
+                        <select id="taskTypeFilter">
+                            <option value="all">Все типы</option>
+                            {% for value, label in task_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <div class="chart-buttons">
                         <button id="showTasks" class="tasks-button">Завершенные задачи</button>
                         <button id="showTime" class="time-button">Затраченное время</button>

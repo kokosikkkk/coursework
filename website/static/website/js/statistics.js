@@ -1,5 +1,7 @@
 let barChart = null;
 let lineChart = null;
+let currentMode = 'tasks';
+let currentFilter = 'all';
 
 
 function formatTime(seconds){
@@ -17,6 +19,20 @@ function formatTime(seconds){
     return sec + 'сек';
 }
 
+function fetchFilteredData(callback){
+    const url = `/statistics/data/?task_type=${currentFilter}`;
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        window.statisticLabels = data.dates;
+        window.statisticData = data.count_comp_tasks;
+        window.statisticTime = data.time;
+        if (callback) callback();
+    })
+    .catch(error => {
+        console.error('Ошибка при загрузки данных:', error);
+    });
+}
 function createBarChart(data, label, color, yTitle, isTime=false){
     let canvas = document.getElementById('barChart');
     let ctx = canvas.getContext('2d');
@@ -138,19 +154,35 @@ function createLineChart(){
         }
     });
 }
-
-document.addEventListener('DOMContentLoaded', function(){
-    createBarChart(window.statisticData, 'Выполненные задачи', 'rgba(44, 42, 41, 0.7)', 'Кол-во задач', false);
-    createLineChart();
-    document.getElementById('showTasks').addEventListener('click', function(){
+function updateAllCharts(){
+    if (currentMode == "tasks"){
         createBarChart(window.statisticData, 'Выполненные задачи', 'rgba(44, 42, 41, 0.7)', 'Количество задач', false);
-        document.getElementById('showTasks').classList.add('active');
+    }else{
+        createBarChart(window.statisticTime, 'Затраченное время', 'rgba(192, 106, 92, 0.5)', 'Секунды', true);
+    }
+    createLineChart();
+}
+document.addEventListener('DOMContentLoaded', function(){
+    updateAllCharts();
+    
+    document.getElementById('showTasks').addEventListener('click', function(){
+        currentMode = 'tasks';
+        updateAllCharts();
+        this.classList.add('active');
         document.getElementById('showTime').classList.remove('active');
 
     });
     document.getElementById('showTime').addEventListener('click', function() {
-        createBarChart(window.statisticTime, 'Затраченное время', 'rgba(192, 106, 92, 0.5)', 'Секунды', true);
-        document.getElementById('showTime').classList.add('active');
+        currentMode = 'time';
+        updateAllCharts();
+        this.classList.add('active')
         document.getElementById('showTasks').classList.remove('active');
     });
-})
+    document.getElementById('taskTypeFilter').addEventListener('change', function() {
+        currentFilter = this.value;
+        fetchFilteredData(function() {
+            updateAllCharts();
+        });
+    });
+});
+

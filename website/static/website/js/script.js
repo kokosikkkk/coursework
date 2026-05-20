@@ -237,3 +237,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+document.querySelectorAll('.subject-icon').forEach(icon =>{
+    icon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const picker = this.closest('.subject-picker');
+        const dropdown = picker.querySelector('.subject-dropdown');
+        document.querySelectorAll('.subject-dropdown').forEach(d =>{
+            if (d !== dropdown) d.style.display = 'none';
+        });
+
+        dropdown.style.display = dropdown.style.display === "none" ? 'block' : 'none';
+    });
+});
+document.querySelectorAll('.subject-dropdown').forEach(dropdown => {
+        dropdown.addEventListener('change', function(){
+            const taskId = this.dataset.id;
+            const newTaskType = this.value;
+            const icon = this.closest('.subject-picker').querySelector('.subject-icon');
+            fetch(`/task/${taskId}/set-type/`,{
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ task_type: newTaskType})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success){
+                    if(data.task_type_display){
+                        icon.innerHTML = '📚 ' + data.task_type_display;
+                    }else{
+                        icon.innerHTML = '📚';
+                    }
+                }
+            });
+     
+            this.style.display = 'none';
+        });
+        dropdown.addEventListener('blur', function(){
+            setTimeout(() =>{
+                this.style.display = 'none';
+
+            }, 200);
+        });
+    });
+
+    document.addEventListener('click', function(){
+        if (!e.target.closest('.subject-picker')) {
+            document.querySelectorAll('.subject-dropdown').forEach(d => {
+                d.style.display = 'none';
+        });
+    }
+    });
+
+
+    
+             
+                

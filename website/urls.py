@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import LoginUser, WelcomeWebsite, about, RegisterUser, show_tasks, is_complete, not_completed, delete_task, toggle_status, edit_task, task_time, statistics_page, profile_page, exit, password_change, username_change, test_base
+from .views import LoginUser, WelcomeWebsite, about, RegisterUser, show_tasks, is_complete, not_completed, delete_task, toggle_status, edit_task, task_time, statistics_page, profile_page, exit, password_change, username_change, test_base, set_type, statistics_data
 
 urlpatterns = [
     path('',WelcomeWebsite.as_view(), name='welcome'),
@@ -18,6 +18,7 @@ urlpatterns = [
     path("logout/", exit, name="logout"),
     path('password-change/', password_change, name='password_change'),
     path('profile/edit/', username_change, name='username_change'),
-    path('test/', test_base, name='test')
-
+    path('test/', test_base, name='test'),
+    path('task/<int:task_id>/set-type/', set_type, name='set_type'),
+    path('statistics/data/', statistics_data, name='statistics_data')
 ]

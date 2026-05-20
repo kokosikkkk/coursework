@@ -7,7 +7,7 @@ from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import RegisterForm
 from django.contrib.auth.views import LoginView
-from .models import ToDoList
+from .models import ToDoList, Subject, TASK_TYPES
 from django.http import JsonResponse
 import json
 from django.contrib.auth import logout
@@ -76,19 +76,31 @@ def show_tasks(request):
             name = request.POST.get('name')
             if name:
                 deadline = request.POST.get('deadline') or None
-                ToDoList.objects.create(
+                subject_id = request.POST.get('subject') or None
+                task_type = request.POST.get('task_type') or 'homework'
+                task = ToDoList.objects.create(
                     user = request.user,
                     task_name = name,
                     status = False,
-                    dead_line = deadline
+                    dead_line = deadline,
+                    task_type = task_type,
                 )
+                if subject_id:
+                    task.subject = Subject.objects.get(id = subject_id, user = request.user)
+                    task.save()
+                
             return redirect('tasks') #перенаправление на ту же страницу
         else:
             tasks = ToDoList.objects.filter(user=request.user).order_by('dead_line')
             tasks = sorted(tasks, key=lambda t: (t.dead_line is None, t.dead_line)) #задачи без даты убираем вниз
-            return render(request, 'website/table.html', {'tasks': tasks})
+            subjects = Subject.objects.filter(user=request.user)
+            return render(request, 'website/table.html', {
+                'tasks': tasks,
+                'subjects': subjects,
+                'task_types': TASK_TYPES,
+            })
     else:
-        return render(request, 'welcome.html')
+        return redirect('welcome')
     
 def is_complete(request, task_id):
     task = ToDoList.objects.get(id=task_id, user=request.user)
@@ -148,24 +160,7 @@ def task_time(request, task_id):
         except ToDoList.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Task not found'})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
-'''
-def statistics_page(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    tasks= ToDoList.objects.filter(user=request.user)
-    total_tasks = tasks.count()
-    completed_tasks = tasks.filter(status=True).count()
 
-    if total_tasks > 0:
-        percent = round(completed_tasks / total_tasks * 100)
-    else:
-        percent = 0
-    return render(request, 'website/statistics.html',{
-        'total_tasks': total_tasks,
-        'completed_tasks': completed_tasks,
-        'percent': percent,
-    })
-'''
 def statistics_page(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -189,14 +184,28 @@ def statistics_page(request):
         'dates': dates,
         'count_comp_tasks': count_comp_tasks,
         'time': time,
-    })
+        'task_types': TASK_TYPES,
+    })   
+def statistics_data(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    task_type = request.GET.get('task_type', 'all')
+    user_tasks = ToDoList.objects.filter(user=request.user)
+
+    if task_type != 'all' and task_type in dict(TASK_TYPES):
+        user_tasks = user_tasks.filter(task_type=task_type)
+    daily_statistic = user_tasks.filter(status=True).exclude(completed_at__isnull=True)\
+        .annotate(day=TruncDate('completed_at')).values('day')\
+        .annotate(tasks_completed=Count('id'), time_spent=Sum('spent_time')).order_by('-day')[:7]
+    dates = [s['day'].strftime('%d.%m') if s['day'] else '-' for s in daily_statistic]
+    count_comp_tasks = [s['tasks_completed'] if s['tasks_completed'] else 0 for s in daily_statistic]
+    time = [s['time_spent'] if s['time_spent'] else 0 for s in daily_statistic]
     
-
-
-
-
-
-
+    return JsonResponse({
+        'dates': dates,
+        'count_comp_tasks': count_comp_tasks,
+        'time': time,
+    })
 def profile_page(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -232,3 +241,22 @@ def username_change(request):
 
 def test_base(request):
     return render(request, 'website/test_base.html')
+
+def set_type(request, task_id):
+    try:
+        task = ToDoList.objects.get(id=task_id, user=request.user)
+        data = json.loads(request.body)
+        new_type = data.get('task_type')
+        
+        if new_type in dict(TASK_TYPES):
+            task.task_type = new_type
+            task.save()
+            return JsonResponse({
+                'success': True, 
+                'task_type_display': task.get_task_type_display()
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'Неверный тип задачи'})
+            
+    except ToDoList.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Задача не найдена'})

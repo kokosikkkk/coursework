@@ -170,3 +170,37 @@ body {
     color: #2c2a29;
     font-weight: 600;
 }
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.filter-row label {
+    font-size: 0.9rem;
+    color: #5c5a58;
+    font-weight: 500;
+}
+
+.filter-row select {
+    padding: 8px 16px;
+    border: 1px solid #ddd6e8;
+    border-radius: 20px;
+    background: white;
+    font-size: 0.9rem;
+    color: #2c2a29;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.filter-row select:hover {
+    border-color: #9FAAD2;
+}
+
+.filter-row select:focus {
+    border-color: #7c4dff;
+    box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.1);
+}
